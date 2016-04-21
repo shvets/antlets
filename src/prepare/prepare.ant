@@ -1,0 +1,65 @@
+<!-- prepare.ant -->
+
+<project name="prepare.ant" default="prepare" basedir=".">
+  <property name="debug" value="false"/>
+  <property name="optimize" value="false"/>
+  <property name="deprecation" value="false"/>
+
+  <property name="launchers.archive.name" value="${lib.dir}/launchers.jar"/>
+  <property name="starters.archive.name" value="${lib.dir}/starters.jar"/>
+
+  <path id="classpath">
+    <pathelement location="${ant.home}/lib/ant-launcher.jar"/>
+    <pathelement location="${ant.home}/lib/ant.jar"/>
+    <pathelement location="${lib.dir}/bsh-2.0b1.jar"/>
+    <pathelement location="${lib.dir}/forehead-1.0-beta-5.jar"/>
+  </path>
+
+  <target name="clean">
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${classes.dir}"/>
+
+    <javac destdir="${classes.dir}"
+           includeAntRuntime="false"
+           debug="${debug}"
+           optimize="${optimize}"
+           deprecation ="${deprecation}">
+        <classpath refid="classpath"/>
+        <src path="${src.dir}/java"/>
+        <include name ="**/*.java"/>
+    </javac>
+  </target>
+
+  <target name="prepare" depends="compile">
+    <jar destfile="${launchers.archive.name}">
+      <fileset dir="${classes.dir}">
+        <include name="**/*.class"/>
+        <include name="**/loader/*.class"/>
+        <include name="**/util/*.class"/>
+
+        <exclude name="**/AntStarter.class"/>
+        <exclude name="**/JarStarter.class"/>
+        <exclude name="**/tools/ant/**/*.class"/>
+      </fileset>
+
+      <zipfileset src="${ant.home}/lib/ant-launcher.jar">
+        <include name="org/apache/tools/ant/launch/LaunchException.class"/>
+        <include name="org/apache/tools/ant/launch/Locator*.class"/>
+        <include name="org/apache/tools/ant/launch/AntMain.class"/>
+      </zipfileset>
+    </jar>
+
+    <jar destfile="${starters.archive.name}">
+      <fileset dir="${classes.dir}">
+        <include name="**/AntStarter.class"/>
+        <include name="**/JarStarter.class"/>
+        <include name="**/tools/ant/**/*.class"/>
+        <exclude name="**/Starter.class"/>
+      </fileset>
+    </jar>
+  </target>
+
+</project>

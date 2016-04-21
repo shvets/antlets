@@ -1,0 +1,55 @@
+
+/**
+ * Selects file or directory
+ */
+String getSelectedFile(String dir, String title, int selectionMode) {
+  JFileChooser chooser = new JFileChooser();
+
+  chooser.setDialogTitle(title);
+  chooser.setCurrentDirectory(new File(dir));
+  chooser.setFileSelectionMode(selectionMode);
+
+  int returnVal = chooser.showOpenDialog(null);
+
+  if(returnVal == JFileChooser.APPROVE_OPTION) {
+    return chooser.getSelectedFile().getPath();
+  }
+
+  return null;
+}
+
+/**
+ * Loads properties file from user's home directory
+ */
+Properties loadProperties(String propsName) {
+  Properties props = new Properties();
+
+  String propsName = System.getProperty("user.home") + File.separator + propsName;
+
+  File propsFile = new File(propsName);
+
+  if(propsFile.exists()) {
+    FileInputStream fis = new FileInputStream(propsFile);
+
+    props.load(fis);
+
+    fis.close();
+  }
+
+  return props;
+}
+
+/**
+ * Saves properties file to user's home directory
+ */
+void saveProperties(Properties props, String propsName) {
+  String fullPropsName = System.getProperty("user.home") + File.separator + propsName;
+
+  File fullPropsFile = new File(fullPropsName);
+
+  FileOutputStream fos = new FileOutputStream(fullPropsFile);
+
+  props.save(fos, "");
+
+  fos.close();
+}

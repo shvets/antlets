@@ -1,0 +1,26 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\.groovy]
+@="ft000004"
+
+[HKEY_CLASSES_ROOT\ft000004]
+"EditFlags"=dword:00000000
+"BrowserFlags"=dword:00000008
+@=""
+
+[HKEY_CLASSES_ROOT\ft000004\shell]
+@="run"
+
+[HKEY_CLASSES_ROOT\ft000004\shell\run]
+
+[HKEY_CLASSES_ROOT\ft000004\shell\run\command]
+@="@install.dir@\\bin\\groovy.bat \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.groovy]
+@="ft000004"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\ft000004\shell\run\command]
+@="@install.dir@\\bin\\groovy.bat \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\""
+
+[HKEY_CURRENT_USER\Software\Classes]
+@="BSH File"

@@ -1,0 +1,26 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\.maven]
+@="ft000007"
+
+[HKEY_CLASSES_ROOT\ft000007]
+"EditFlags"=dword:00000000
+"BrowserFlags"=dword:00000008
+@=""
+
+[HKEY_CLASSES_ROOT\ft000007\shell]
+@="run"
+
+[HKEY_CLASSES_ROOT\ft000007\shell\run]
+
+[HKEY_CLASSES_ROOT\ft000007\shell\run\command]
+@="@install.dir@\\bin\\maven.bat -maven \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.maven]
+@="ft000007"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\ft000007\shell\run\command]
+@="@install.dir@\\bin\\maven.bat -maven \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\""
+
+[HKEY_CURRENT_USER\Software\Classes]
+@="Maven File"

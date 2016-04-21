@@ -1,0 +1,26 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\.judo]
+@="ft000008"
+
+[HKEY_CLASSES_ROOT\ft000008]
+"EditFlags"=dword:00000000
+"BrowserFlags"=dword:00000008
+@=""
+
+[HKEY_CLASSES_ROOT\ft000008\shell]
+@="run"
+
+[HKEY_CLASSES_ROOT\ft000008\shell\run]
+
+[HKEY_CLASSES_ROOT\ft000008\shell\run\command]
+@="@install.dir@\\bin\\judo.bat \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\.judo]
+@="ft000008"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\ft000008\shell\run\command]
+@="@install.dir@\\bin\\judo.bat \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\""
+
+[HKEY_CURRENT_USER\Software\Classes]
+@="Judo File"

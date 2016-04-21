@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Antlets" default="usage" basedir=".">
+  <description>
+    This script contains different tasks for Antlets project
+  </description>
+
+  <property file="antlets.version"/>
+
+  <property file="common.properties"/>
+  <property file="build.properties"/>
+
+  <property name="regedit.switch" value="/s"/>
+
+  <target name="usage">
+    <java classname="org.apache.tools.ant.Main">
+       <arg line="-projecthelp"/>
+       <arg line="-f ${ant.file}"/>
+    </java>
+  </target>
+
+  <target name="init">
+    <echo message="----------- ${ant.project.name} v. ${version} [${year}] ------------"/>
+    <echo message="----------- ${company} All Right reserved ------------"/>
+
+    <echo message="    Operating System : ${os.name}" />
+    <echo message="    Java Version     : ${ant.java.version}" />
+    <echo message="    Compiler         : ${build.compiler}" />
+
+    <tstamp/>
+
+    <script language="beanshell">
+      String javaHome = project.getProperty("java.home");
+
+      if(javaHome.endsWith("jre")) {
+        javaHome = javaHome.substring(0, javaHome.length()-4);
+      }
+
+      project.setProperty("java.home", javaHome);
+    </script>
+  </target>
+
+  <target name="clean"
+          description="Removes all compiled classes">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <target name="install.antlets" depends="init"
+          description="Install Script Engines (Ant, Beanshell, JavaScript etc. on computer) ">
+    <script language="beanshell" src="${src.dir}/prepare/utils.bsh">
+      import javax.swing.JFileChooser;
+      import org.apache.tools.ant.taskdefs.CallTarget;
+      import org.apache.tools.ant.Location;
+
+      String propsFileName = ".antlets.properties";
+
+      Properties props = loadProperties(propsFileName);
+
+      String installDir = project.getProperty("install.dir");
+
+      if(installDir != null) {
+        props.setProperty("install.dir", installDir);
+      }
+      else {
+        installDir = props.getProperty("install.dir");
+
+        if(installDir == null) {
+          installDir = ".";
+        }
+
+        installDir = getSelectedFile(installDir,
+                                     "Select Installation Folder:",
+                                     JFileChooser.DIRECTORIES_ONLY);
+        if(installDir == null) {
+          System.exit(0);
+        }
+      }
+
+      props.setProperty("install.dir", installDir);
+
+      StringBuffer sb = new StringBuffer();
+
+      for(int i=0; i &lt; installDir.length(); i++) {
+        char ch = installDir.charAt(i);
+
+        if(ch == '\\') {
+          sb.append(ch);
+          sb.append(ch);
+        }
+        else {
+          sb.append(ch);
+        }
+      }
+
+      project.setNewProperty("install.dir.for.win", sb.toString());
+
+      saveProperties(props, propsFileName);
+
+      project.setNewProperty("install.dir", installDir);
+
+      CallTarget callTarget = new CallTarget();
+
+      callTarget.setTarget("install");
+      callTarget.setProject(project);
+
+      callTarget.execute();
+    </script>
+  </target>
+
+  <target name="install">
+    <copy todir="${install.dir}" file="README.txt"/>
+
+    <copy todir="${install.dir}/Licences" failonerror="false">
+      <fileset dir="Licences"/>
+    </copy>
+
+    <copy todir="${install.dir}/bin" filtering="true" overwrite="true">
+      <filterset>
+        <filter token="java.home" value="${java.home}"/>
+        <filter token="ant.home" value="${ant.home}"/>
+        <filter token="maven.home" value="${maven.home}"/>
+        <filter token="install.dir" value="${install.dir}"/>
+      </filterset>
+
+      <fileset dir="${src.dir}/setup">
+        <include name ="*.bat"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${install.dir}/bin" filtering="true" overwrite="true">
+      <filterset>
+        <filter token="install.dir" value="${install.dir.for.win}"/>
+      </filterset>
+
+      <fileset dir="${src.dir}/setup">
+        <include name ="*.reg"/>
+      </fileset>
+    </copy>
+
+    <ant antfile="${src.dir}/prepare/prepare.ant"/>
+
+    <copy todir="${install.dir}/lib">
+      <fileset dir="lib">
+        <exclude name="forehead-*"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${install.dir}/lib">
+      <fileset dir="lib">
+        <include name ="starters.jar"/>
+      </fileset>
+    </copy>
+
+    <apply executable="regedit.exe" parallel="true" output="tmp.tmp">
+      <arg value="${regedit.switch}"/>
+
+      <fileset dir="${install.dir}/bin">
+        <include name="*.reg"/>
+      </fileset>
+    </apply>
+
+    <delete file="tmp.tmp" quiet="true"/>
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <target name="archive" depends="prepare, archive-lib"
+          description="Creates zip file for all source files">
+    <zip zipfile="${build.dir}/${ant.project.name}-${antlets.version}-src.zip">
+      <zipfileset dir="." prefix="${ant.project.name}">
+        <include name ="Licences/*.*"/>
+        <include name ="idea/*.*"/>
+        <include name ="${src.dir}/**"/>
+
+        <include name ="*.version"/>
+        <include name ="*.properties"/>
+        <include name ="*.ant"/>
+        <include name ="*.bat"/>
+        <include name ="*.txt"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <target name="archive-lib" depends="prepare"
+          description="Creates zip file for all lib files">
+    <zip zipfile="${build.dir}/${ant.project.name}-${antlets.version}-lib.zip">
+      <zipfileset dir="." prefix="${ant.project.name}">
+        <include name ="**/*.jar"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <target name="archive.to.release" depends="prepare">
+    <zip zipfile="${build.dir}/${ant.project.name}-${antlets.version}.zip">
+      <zipfileset dir="." prefix="${ant.project.name}">
+        <include name ="lib/**"/>
+        <include name ="Licences/**"/>
+        <include name ="${src.dir}/**"/>
+
+        <include name ="*.version"/>
+        <include name ="*.properties"/>
+        <include name ="antlets.ant"/>
+        <include name ="install.bat"/>
+        <include name ="README.txt"/>
+      </zipfileset>
+    </zip>
+
+    <zip zipfile="${build.dir}/${ant.project.name}-examples-${antlets.version}.zip">
+      <zipfileset dir="../examples" prefix="${ant.project.name}/examples">
+        <include name ="**"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <property name="ftp.server" value ="upload.sourceforge.net"/>
+  <property name="ftp.remotedir" value ="incoming"/>
+  <property name="ftp.user" value ="anonymous"/>
+  <property name="ftp.password" value ="shvets@comcast.net"/>
+
+  <target name = "ftp.put">
+    <ftp action="put"
+         server="${ftp.server}" port="21"
+         userid="${ftp.user}" password="${ftp.password}"
+         remotedir="${ftp.remotedir}"
+         ignoreNoncriticalErrors="yes"
+         depends="yes"
+         binary="yes"
+         verbose="true">
+     <fileset dir="${build.dir}">
+        <include name="Antlets-with*.*"/>
+      </fileset>
+    </ftp>
+  </target>
+
+</project>
